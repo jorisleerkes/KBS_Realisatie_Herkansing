@@ -2,12 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class GUI extends JFrame implements ActionListener {
-
-
-    private JTextField jtfGebruiker;
-    private JTextField jtfWachtwoord;
+    public JTextField jtfGebruiker;
+    public JTextField jtfWachtwoord;
     private JButton jbInloggen;
     private JButton jbCancel;
 
@@ -35,15 +35,38 @@ public class GUI extends JFrame implements ActionListener {
 
 
     jbInloggen.addActionListener(new ActionListener() {
+
         @Override
-        public void actionPerformed(ActionEvent R) {
+        public void actionPerformed(ActionEvent R) {;
             System.out.println("ingelogd");
-            accountAanmaken();
+            try {
+                accountInloggen();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     });
 }
-    public void accountAanmaken(){
-        DBConnector.performUpdate("INSERT INTO users(UserID, Name, Password) VALUES(2,4, 5)");
+
+
+    //accountAanmaken gaat uiteindelijk meegeven wat in de JTextfields geschreven wordt van het dialoog die nog gemaakt moet worden.
+    public void accountAanmaken(int test, int test2){
+        DBConnector.performUpdate(String.format("INSERT INTO users(Name, Password) VALUES(%s, %s)" ,test, test2));
+    }
+
+    //Wat hier nog moet gebeuren is dat de gegevens van een row uit de database vergeleken wordt met wat de gebruiker heeft ingevoerd.
+    public void accountInloggen() throws SQLException {
+        ResultSet Gebruikersnaam = (DBConnector.performQuery("SELECT Name FROM users"));
+        ResultSet PassWord = (DBConnector.performQuery("SELECT Password FROM users"));
+
+        while(Gebruikersnaam.next()) {
+            String GebruikersNaamPrint = Gebruikersnaam.getString("Name");
+            System.out.println(GebruikersNaamPrint);
+        }
+        while(PassWord.next()) {
+            String PassWordPrint = PassWord.getString("Password");
+            System.out.println(PassWordPrint);
+        }
     }
 
     @Override
