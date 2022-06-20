@@ -53,7 +53,7 @@ public class RegisterDialoog extends JDialog implements ActionListener {
 
     //sql syntax error?
     public void accountAanmaken(String user, String password){
-        DBConnector.performUpdate(String.format("INSERT INTO users(Name, Password) VALUES(%s, %s)" ,user, password));
+        DBConnector.performUpdate(String.format("INSERT INTO users(Name, Password) VALUES('%s', '%s')", user, password));
     }
 
 
