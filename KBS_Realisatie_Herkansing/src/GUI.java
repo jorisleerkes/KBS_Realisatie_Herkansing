@@ -4,12 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class GUI extends JFrame implements ActionListener {
     public JTextField jtfGebruiker;
     public JTextField jtfWachtwoord;
     private JButton jbInloggen;
-    private JButton jbCancel;
+    private JButton jbRegister;
 
 
     public GUI() {
@@ -24,38 +25,53 @@ public class GUI extends JFrame implements ActionListener {
         jtfGebruiker = new JTextField(7);
         jtfWachtwoord = new JTextField(7);
         jbInloggen = new JButton("Login");
-        jbCancel = new JButton("Cancel");
+        jbRegister = new JButton("Registreren");
         add(new JLabel("Gebruikersnaam"));
         add(jtfGebruiker);
         add(new JLabel("Wachtwoord"));
         add(jtfWachtwoord);
         add(jbInloggen);
-        add(jbCancel);
+        add(jbRegister);
         setVisible(true);
 
 
-    jbInloggen.addActionListener(new ActionListener() {
+        jbInloggen.addActionListener(new ActionListener() {
 
-        @Override
-        public void actionPerformed(ActionEvent R) {;
-            System.out.println("ingelogd");
-            try {
-                accountInloggen();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            @Override
+            public void actionPerformed(ActionEvent R) {
+                ;
+                System.out.println("Gedrukt");
+                try {
+                    accountInloggen();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-    });
-}
+        });
 
+        jbRegister.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == jbRegister) {
+                    RegisterDialoog dialoog = new RegisterDialoog();
+                }
+            }
 
-    //accountAanmaken gaat uiteindelijk meegeven wat in de JTextfields geschreven wordt van het dialoog die nog gemaakt moet worden.
-    public void accountAanmaken(int test, int test2){
-        DBConnector.performUpdate(String.format("INSERT INTO users(Name, Password) VALUES(%s, %s)" ,test, test2));
+        });
     }
 
-    //Wat hier nog moet gebeuren is dat de gegevens van een row uit de database vergeleken wordt met wat de gebruiker heeft ingevoerd.
     public void accountInloggen() throws SQLException {
+        String user, password;
+        user = jtfGebruiker.getText();
+        password = jtfWachtwoord.getText();
+
+        ResultSet WachtwoordCheck = (DBConnector.performQuery("SELECT Password FROM users WHERE Name = " + user));
+
+        //werkt niet
+        if(Objects.equals(toString(WachtwoordCheck), password)){
+            System.out.print("ingelogd");
+        }
+
         ResultSet Gebruikersnaam = (DBConnector.performQuery("SELECT Name FROM users"));
         ResultSet PassWord = (DBConnector.performQuery("SELECT Password FROM users"));
 
@@ -67,6 +83,10 @@ public class GUI extends JFrame implements ActionListener {
             String PassWordPrint = PassWord.getString("Password");
             System.out.println(PassWordPrint);
         }
+    }
+
+    private String toString(ResultSet wachtwoordCheck) {
+        return String.valueOf(wachtwoordCheck);
     }
 
     @Override
