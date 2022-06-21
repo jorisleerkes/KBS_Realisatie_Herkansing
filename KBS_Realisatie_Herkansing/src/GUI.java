@@ -2,8 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Objects;
 
 public class GUI extends JFrame implements ActionListener {
@@ -11,7 +10,7 @@ public class GUI extends JFrame implements ActionListener {
     public JTextField jtfWachtwoord;
     private JButton jbInloggen;
     private JButton jbRegister;
-
+    private String user, password;
 
     public GUI() {
 
@@ -23,7 +22,7 @@ public class GUI extends JFrame implements ActionListener {
 
 
         jtfGebruiker = new JTextField(7);
-        jtfWachtwoord = new JTextField(7);
+        jtfWachtwoord = new JPasswordField(7);
         jbInloggen = new JButton("Login");
         jbRegister = new JButton("Registreren");
         add(new JLabel("Gebruikersnaam"));
@@ -39,8 +38,6 @@ public class GUI extends JFrame implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent R) {
-                ;
-                System.out.println("Gedrukt");
                 try {
                     accountInloggen();
                 } catch (SQLException e) {
@@ -60,6 +57,24 @@ public class GUI extends JFrame implements ActionListener {
         });
     }
 
+    public String getUser() {
+        try {
+            user = jtfGebruiker.getText();
+        } catch (NumberFormatException nfe) {
+            user = null;
+        }
+        return user;
+    }
+
+    public String getPassword() {
+        try {
+            password = jtfWachtwoord.getText();
+        } catch (NumberFormatException nfe) {
+            password = null;
+        }
+        return password;
+    }
+
     public void accountInloggen() throws SQLException {
         String user, password;
         user = jtfGebruiker.getText();
@@ -67,27 +82,27 @@ public class GUI extends JFrame implements ActionListener {
 
         ResultSet WachtwoordCheck = (DBConnector.performQuery("SELECT Password FROM users WHERE Name = " + user));
 
-        //werkt niet
-        if(Objects.equals(toString(WachtwoordCheck), password)){
-            System.out.print("ingelogd");
+        assert WachtwoordCheck != null;
+        if(WachtwoordCheck.next()) {
+            String PassWordPrint2 = WachtwoordCheck.getString("Password");
+            if(Objects.equals(getPassword(), PassWordPrint2)){
+                System.out.print("ingelogd");
+                new Pakbon(null);
+            }
         }
 
-        ResultSet Gebruikersnaam = (DBConnector.performQuery("SELECT Name FROM users"));
-        ResultSet PassWord = (DBConnector.performQuery("SELECT Password FROM users"));
 
-        while(Gebruikersnaam.next()) {
-            String GebruikersNaamPrint = Gebruikersnaam.getString("Name");
-            System.out.println(GebruikersNaamPrint);
-        }
-        while(PassWord.next()) {
-            String PassWordPrint = PassWord.getString("Password");
-            System.out.println(PassWordPrint);
-        }
-    }
 
-    private String toString(ResultSet wachtwoordCheck) {
-        return String.valueOf(wachtwoordCheck);
-    }
+        //ResultSet Gebruikersnaam = (DBConnector.performQuery("SELECT Name FROM users"));
+        //ResultSet PassWord = (DBConnector.performQuery("SELECT Password FROM users"));
+        //while(Gebruikersnaam.next()) {
+        //    String GebruikersNaamPrint = Gebruikersnaam.getString("Name");
+        //    System.out.println(GebruikersNaamPrint);
+        //}
+        //while(PassWord.next()) {
+        //    String PassWordPrint = PassWord.getString("Password");
+        //   System.out.println(PassWordPrint);
+        }
 
     @Override
     public void actionPerformed(ActionEvent e) {
